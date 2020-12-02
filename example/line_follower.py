@@ -152,17 +152,11 @@ def destroy():
 	fw.turn(90)
 
 if __name__ == '__main__':
-	try:
 		try:
 			while True:
 				setup()
 				main()
 				#straight_run()
-		except Exception as e:
-			print(e)
-			print('error try again in 5')
+		except KeyboardInterrupt:
 			destroy()
-			time.sleep(5)
-	except KeyboardInterrupt:
-		destroy()
 
