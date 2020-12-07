@@ -19,11 +19,12 @@ import picar
 import ctypes
 import pathlib
 import sys
+import os
 
 
 # This is the beginning of the script
 # Initialize the access to the C library
-libname = pathlib.Path().absolute() / "../../uobjcoll-SunFounder_Line_Follower/libLine_Follower.so"
+libname = os.path.abspath(".") + "/" + "../../uobjcoll-SunFounder_Line_Follower/libLine_Follower.so";
 print(libname)
 c_lib = ctypes.CDLL(libname)
 
@@ -71,11 +72,11 @@ def main():
 	while True:
 		#lt_status_now = lf.read_digital()
                 ### clib call
-		lt_list_now = []
+		lt_status_now = []
 		dt_list = c_lib.read_digital()
 		ptr = ctypes.cast(dt_list,ctypes.POINTER(ctypes.c_int))
 		for i in range(0,5):
-			lt_list_now.append(ptr[i])
+			lt_status_now.append(ptr[i])
 		print(lt_status_now)
 		# Angle calculate
 		if	lt_status_now == [0,0,1,0,0]:
@@ -170,16 +171,10 @@ def destroy():
 
 if __name__ == '__main__':
 	try:
-		try:
-			while True:
-				setup()
-				main()
-				#straight_run()
-		except Exception as e:
-			print(e)
-			print('error try again in 5')
-			destroy()
-			time.sleep(5)
+		while True:
+			setup()
+			main()
+			#straight_run()
 	except KeyboardInterrupt:
 		destroy()
 
