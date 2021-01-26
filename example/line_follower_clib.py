@@ -29,6 +29,10 @@ print(libname)
 c_lib = ctypes.CDLL(libname)
 
 picar.setup()
+rslt = c_lib.lib_init()
+if rslt == -1:
+	print("lib_init() failed")
+	exit()
 
 REFERENCES = [200, 200, 200, 200, 200]
 #calibrate = True
@@ -168,6 +172,9 @@ def cali():
 def destroy():
 	bw.stop()
 	fw.turn(90)
+	rslt = c_lib.lib_exit()
+	if rslt == -1:
+		print("lib_exit() failed")
 
 if __name__ == '__main__':
 	try:
