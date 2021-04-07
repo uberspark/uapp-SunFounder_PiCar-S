@@ -22,8 +22,9 @@ int pid_set_limits(float low_lim_input, float high_lim_input) {
     return 0;
 }
 
-void pid_reset_integral() {
+int pid_reset_integral() {
     integral_error = 0;
+    return 0;
 }
 
 float pid_clip(float correction) {
