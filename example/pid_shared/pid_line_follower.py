@@ -2,6 +2,7 @@ from SunFounder_Line_Follower import Line_Follower
 from picar import front_wheels
 from picar import back_wheels
 import picar
+import sys, getopt
 
 import ctypes
 import os
@@ -9,12 +10,13 @@ import os
 BASE_SPEED = 50
 BASE_ANGLE = 90
 ANGLE_OFFSET = 15
-THRESHOLD = 150
 
 
 def wrap_func(f, restype, argtypes):
 	f.restype = restype
 	f.argtypes = argtypes
+
+
 
 def stop():
 	bw.stop()
@@ -36,13 +38,30 @@ def follow_line():
 		sensor_reading = get_sensor_readings()
 		sensor_data = (ctypes.c_int * 5)(*sensor_reading)
 		angle = pid_lib.pid_compute(sensor_data, 5)
-
+		if verbose:
+			print(sensor_reading, angle)
 		# Write to servo
 		if angle > 0: angle += ANGLE_OFFSET
 		fw.turn(BASE_ANGLE + angle)
 
 
 if __name__ == '__main__':
+	argv = sys.argv[1:]
+	THRESHOLD = 0
+	verbose = False
+	try:
+		opts, args = getopt.getopt(argv,"vt:",["threshold="])
+	except getopt.GetoptError:
+		print ('pid_line_follower.py -t <threshold>')
+		sys.exit(2)
+
+	for opt, arg in opts:
+		if opt == '-v':
+			verbose = True
+
+		elif opt in ("-t", "--threshold"):
+			THRESHOLD = float(arg)
+
 	picar.setup()
 	lf = Line_Follower.Line_Follower()
 	fw = front_wheels.Front_Wheels(db='config')
@@ -55,7 +74,7 @@ if __name__ == '__main__':
 	wrap_func(pid_lib.pid_set_limits, ctypes.c_int, [ctypes.c_float, ctypes.c_float])
 	wrap_func(pid_lib.pid_compute, ctypes.c_float, [ctypes.POINTER(ctypes.c_int), ctypes.c_int])
 
-	pid_lib.pid_init_gains(5, 0.01, 0.1)
+	pid_lib.pid_init_gains(5, 0, 0)
 	pid_lib.pid_set_limits(-20, 20)
 
 	try:
@@ -63,5 +82,4 @@ if __name__ == '__main__':
 		follow_line()
 	except KeyboardInterrupt:
 		stop()
-
 
