@@ -39,7 +39,8 @@ float pid_compute_error(int *sensor_data, int size) {
     float error = 0;
     float count = 0;
 
-    for (int idx=0; idx < size; idx++) {
+    int idx = 0;
+    for (idx = 0; idx < size; idx++) {
         if(sensor_data[idx] == 1) {
             error += (float)weights[idx];
             count += 1;
