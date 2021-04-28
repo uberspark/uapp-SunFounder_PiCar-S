@@ -2,7 +2,7 @@
 
 ## Installation
 - make the directory to generate 'pid.so' file.
-- This shared library can be then copied to the working directory and interfaced with .py script
+- This shared library should be then copied to the 'examples' directory and interfaced with .py script
 
 ## Usage
 Following API functions are implemented
