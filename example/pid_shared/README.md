@@ -18,3 +18,12 @@ This resets the integral term manually if the user wants to reset the PID algori
 - float pid_compute(int *sensor_data, int size)
 This function copmutation the correction based on sensor readings of line following sensor. Currently it accespts the digital values between 0 and 1
 for each sensor. It needs to called in the main loop to get correction for that state. Returns the correction as a single precision float.
+
+## Ideal Parameters
+- THRESHOLD = 30 for dark wooden background. THRESHOLD = 150 for lighter background
+- Use calibrate.py to get an ideal THRESHOLD value in real time
+- PID gain: Kp = 5, Ki = 0, Kd = 0
+
+## Limitations
+- The current PID settings supports all smooth turns but unpredictable output for sharp turns.
+- Car is able to follow a sharp turn upto 30deg
