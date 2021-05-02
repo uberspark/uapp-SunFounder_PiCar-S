@@ -20,7 +20,7 @@ This function copmutation the correction based on sensor readings of line follow
 for each sensor. It needs to called in the main loop to get correction for that state. Returns the correction as a single precision float.
 
 ### Running python driver code
-- python3 pid_line_follower.py -v -t <THRESHOLD>
+- python3 pid_line_follower.py -v -t THRESHOLD
 - -v is verbose flag that prints out sensor data and correction by PID algorithm
 
 ## Ideal Parameters
