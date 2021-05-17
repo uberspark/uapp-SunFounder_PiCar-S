@@ -2,6 +2,7 @@
 This is a work in progress and is currently implemented in python. Later the error computing functions that use kalman filter will be shifted to uberObject friendly C code base and a shred library will be generated. The PID shared library can be used once the error is computed using line position estimation.
 
 ## Usage
+- Copy the script in the /examples folder
 - python3 pid_line_follower.py will execute the standalone python file.
 - 'def scale(value, index, min_scale=14, max_scale=45)' functions scales th input sensor readings between min_scale and max_scale. The actual sensor min and sensor max are hardcode in a form of a list in the function. Depending on the surface, user may need to update these values.
 - Note: the calibrate functionanilty can be modified to print sensorwise min and max values.
