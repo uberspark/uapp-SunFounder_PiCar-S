@@ -68,69 +68,6 @@ def setup():
 
 
 
-def calculate_angle():
-	global forward_speed
-	global off_track_count
-	global a_step
-	global b_step 
-	global c_step 
-	global d_step 
-	global lt_status_now
-	# Angle calculate
-	if	lt_status_now == [0,0,1,0,0]:
-		step = 0	
-	elif lt_status_now == [0,1,1,0,0] or lt_status_now == [0,0,1,1,0]:
-		step = a_step
-		bw.speed = forward_speed - 10 
-	elif lt_status_now == [0,1,0,0,0] or lt_status_now == [0,0,0,1,0]:
-		step = b_step
-		bw.speed = forward_speed - 15 
-	elif lt_status_now == [1,1,0,0,0] or lt_status_now == [0,0,0,1,1]:
-		step = c_step
-		bw.speed = forward_speed - 25 
-	elif lt_status_now == [1,0,0,0,0] or lt_status_now == [0,0,0,0,1]:
-		step = d_step
-		bw.speed = forward_speed - 35 
-	else:   # Handle the case when we read all 0s - when we are completely out
-		step = d_step
-		bw.speed = forward_speed - 40
-
-	# Direction calculate
-	if	lt_status_now == [0,0,1,0,0]:
-		off_track_count = 0
-		fw.wheel.write(90)
-		current_angle = 90
-	# turn right
-	elif lt_status_now in ([0,1,1,0,0],[0,1,0,0,0],[1,1,0,0,0],[1,0,0,0,0]):
-		off_track_count = 0
-		turning_angle = int(90 - step)
-	# turn left
-	elif lt_status_now in ([0,0,1,1,0],[0,0,0,1,0],[0,0,0,1,1],[0,0,0,0,1]):
-		off_track_count = 0
-		turning_angle = int(90 + step)
-
-	elif lt_status_now == [0,0,0,0,0]:
-		off_track_count += 1
-		if off_track_count > max_off_track_count:
-			tmp_angle = (turning_angle-90)/abs(90-turning_angle)
-			tmp_angle *= fw.turning_max
-			bw.speed = backward_speed
-			bw.backward()
-			fw.wheel.write(tmp_angle)
-			current_angle = tmp_angle
-				
-			### clib call
-			c_lib.wait_tile_center()
-			bw.stop()
-
-			fw.wheel.write(turning_angle)
-			current_angle = turning_angle
-			time.sleep(0.2)
-			bw.speed = forward_speed
-			bw.forward()
-			time.sleep(0.2)
-		else:
-			off_track_count = 0
 
 
 def main():
