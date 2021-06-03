@@ -44,9 +44,9 @@ current_angle = 0
 off_track_count = 0
 step=0
 a_step = 2
-b_step = 8 
-c_step = 24 
-d_step = 40 
+b_step = 8
+c_step = 24
+d_step = 40
 
 max_off_track_count = 40
 
@@ -59,7 +59,8 @@ lf.references = REFERENCES
 fw.ready()
 bw.ready()
 fw.turning_max = 45
-lt_status_now = []
+
+
 
 
 def setup():
@@ -67,6 +68,30 @@ def setup():
 		cali()
 
 
+def calculate_speed(lt_st_now,fw_speed,st):
+	speed=fw_speed
+	a_step = 2
+	b_step = 8
+	c_step = 24
+	d_step = 40
+	if	lt_st_now == [0,0,1,0,0]:
+		st = 0
+	elif lt_st_now == [0,1,1,0,0] or lt_st_now == [0,0,1,1,0]:
+		step = a_step
+		speed = fw_speed - 10
+	elif lt_st_now == [0,1,0,0,0] or lt_st_now == [0,0,0,1,0]:
+		st = b_step
+		speed = fw_speed - 15
+	elif lt_st_now == [1,1,0,0,0] or lt_st_now == [0,0,0,1,1]:
+		st = c_step
+		speed = forward_speed - 25
+	elif lt_st_now == [1,0,0,0,0] or lt_st_now == [0,0,0,0,1]:
+		st = d_step
+		speed = fw_speed - 35
+	else:   # Handle the case when we read all 0s - when we are completely out
+		st = d_step
+		speed = fw_speed - 40
+	return speed,st
 
 
 
@@ -75,7 +100,8 @@ def main():
 
 	bw.speed = forward_speed
 	bw.forward()
-	global lt_status_now
+	lt_status_now = []
+	step = 0
 
 	start_time_ms = time.time() * 1000
 	while True:
@@ -88,26 +114,11 @@ def main():
 
 		diff_ms = (time.time() * 1000) - start_time_ms
 		print(str(lt_status_now)[1:-1] + ", " + str(diff_ms))
-                
+
 		off_track_count = 0
+
 		# Angle calculate
-		if	lt_status_now == [0,0,1,0,0]:
-			step = 0	
-		elif lt_status_now == [0,1,1,0,0] or lt_status_now == [0,0,1,1,0]:
-			step = a_step
-			bw.speed = forward_speed - 10 
-		elif lt_status_now == [0,1,0,0,0] or lt_status_now == [0,0,0,1,0]:
-			step = b_step
-			bw.speed = forward_speed - 15 
-		elif lt_status_now == [1,1,0,0,0] or lt_status_now == [0,0,0,1,1]:
-			step = c_step
-			bw.speed = forward_speed - 25 
-		elif lt_status_now == [1,0,0,0,0] or lt_status_now == [0,0,0,0,1]:
-			step = d_step
-			bw.speed = forward_speed - 35 
-		else:   # Handle the case when we read all 0s - when we are completely out
-			step = d_step
-			bw.speed = forward_speed - 40
+		bw.speed,step = calculate_speed(lt_status_now,forward_speed,step)
 
 		# Direction calculate
 		if	lt_status_now == [0,0,1,0,0]:
@@ -132,7 +143,7 @@ def main():
 				bw.backward()
 				fw.wheel.write(tmp_angle)
 				current_angle = tmp_angle
-				
+
 				### clib call
 				c_lib.wait_tile_center()
 				bw.stop()
