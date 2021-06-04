@@ -21,32 +21,32 @@ void calculate_speed(int *array,int arr_len,int fw_speed,int *sp, int *st){
       (array[3] == 0) && (array[4] == 0) ) ||
       ((array[0] == 0) && (array[1] == 0) && (array[2] == 1) &&
       (array[3] == 1) && (array[4] == 0))) {
-      *st = *st + a_step;
+      *st =  a_step;
       *sp = fw_speed - 10;
    }
    else if(((array[0] == 0) && (array[1] == 1) && (array[2] == 0) &&
       (array[3] == 0) && (array[4] == 0) ) ||
       ((array[0] == 0) && (array[1] == 0) && (array[2] == 0) &&
       (array[3] == 1) && (array[4] == 0))) {
-      *st = *st + b_step;
+      *st = b_step;
       *sp = fw_speed - 15;
    }
    else if(((array[0] == 1) && (array[1] == 1) && (array[2] == 0) &&
       (array[3] == 0) && (array[4] == 0) ) ||
       ((array[0] == 0) && (array[1] == 0) && (array[2] == 0) &&
       (array[3] == 1) && (array[4] == 1))) {
-      *st = *st + c_step;
+      *st = c_step;
       *sp = fw_speed - 25;
    }
    else if(((array[0] == 1) && (array[1] == 0) && (array[2] == 0) &&
       (array[3] == 0) && (array[4] == 0) ) ||
       ((array[0] == 0) && (array[1] == 0) && (array[2] == 0) &&
       (array[3] == 0) && (array[4] == 1))) {
-      *st = *st + d_step;
+      *st = d_step;
       *sp = fw_speed - 35;
    }
    else{
-      *st = *st + d_step;
+      *st = d_step;
       *sp = fw_speed - 40;
    }
 }
@@ -65,7 +65,7 @@ void calculate_angle(int *array,int arr_len,int *turn_angle, int st){
       (array[3] == 0) && (array[4] == 0)) ||
       ((array[0] == 1) && (array[1] == 0) && (array[2] == 0) &&
       (array[3] == 0) && (array[4] == 0)) ) {
-      *turn_angle = 90 - st;
+      *turn_angle = (int)(90 - st);
    }
    else if(((array[0] == 0) && (array[1] == 0) && (array[2] == 1) &&
       (array[3] == 1) && (array[4] == 0) ) ||
@@ -75,7 +75,7 @@ void calculate_angle(int *array,int arr_len,int *turn_angle, int st){
       (array[3] == 1) && (array[4] == 1)) ||
       ((array[0] == 0) && (array[1] == 0) && (array[2] == 0) &&
       (array[3] == 0) && (array[4] == 1)) ) {
-      *turn_angle = 90 + st;
+      *turn_angle = (int)(90 + st);
    }
 }
 

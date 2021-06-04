@@ -161,14 +161,14 @@ def main():
 			else:
 				off_track_count = 0
 		else:
-			ret_speed,step,turning_angle = calculate_angle_speed(lt_status_now,forward_speed,turning_angle,step)
-			bw.speed = ret_speed
+			# Call either Python or C functions for getting speed and angle
+			#ret_speed,step,turning_angle = calculate_angle_speed(lt_status_now,forward_speed,turning_angle,step)
+			#bw.speed = ret_speed
 			bang_list = bang_lib.calculate_angle_speed(numpy.array(lt_status_now),5,forward_speed,turning_angle,step)
 			ptr = ctypes.cast(bang_list,ctypes.POINTER(ctypes.c_int))
-			print(ret_speed,ptr[0])
 			bw.speed = ptr[0] 
-			print(step,ptr[1])
-			print(turning_angle,ptr[2])
+			step = ptr[1]
+			turning_angle = ptr[2]
 			
 		fw.wheel.write(turning_angle)
 		current_angle = turning_angle
