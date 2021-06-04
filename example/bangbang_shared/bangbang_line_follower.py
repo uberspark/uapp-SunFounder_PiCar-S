@@ -95,16 +95,22 @@ def calculate_speed(lt_st_now,fw_speed,st):
 
 
 def calculate_angle(lt_st_now,turn_angle,st):
-		if	lt_st_now == [0,0,1,0,0]:
-			turn_angle = 90
-		# turn right
-		elif lt_st_now in ([0,1,1,0,0],[0,1,0,0,0],[1,1,0,0,0],[1,0,0,0,0]):
-			turn_angle = int(90 - st)
-		# turn left
-		elif lt_st_now in ([0,0,1,1,0],[0,0,0,1,0],[0,0,0,1,1],[0,0,0,0,1]):
-			turn_angle = int(90 + st)
-		return turn_angle
+	if	lt_st_now == [0,0,1,0,0]:
+		turn_angle = 90
+	# turn right
+	elif lt_st_now in ([0,1,1,0,0],[0,1,0,0,0],[1,1,0,0,0],[1,0,0,0,0]):
+		turn_angle = int(90 - st)
+	# turn left
+	elif lt_st_now in ([0,0,1,1,0],[0,0,0,1,0],[0,0,0,1,1],[0,0,0,0,1]):
+		turn_angle = int(90 + st)
+	return turn_angle
 
+
+def calcualate_angle_speed(lt_st_now,fw_speed,turn_angle,st):
+	speed,step = calculate_speed(lt_st_now,fw_speed,st)
+	turn_angle = calculate_angle(lt_st_now,turn_angle,st)
+	return speed,step,turn_angle
+	
 
 
 def main():
@@ -130,7 +136,7 @@ def main():
 		off_track_count = 0
 
 		# Angle calculate
-		bw.speed,step = calculate_speed(lt_status_now,forward_speed,step)
+		#bw.speed,step = calculate_speed(lt_status_now,forward_speed,step)
 
 		if lt_status_now == [0,0,0,0,0]:
 			off_track_count += 1
@@ -155,7 +161,8 @@ def main():
 			else:
 				off_track_count = 0
 		else:
-			turning_angle = calculate_angle(lt_status_now,turning_angle,step)
+			#turning_angle = calculate_angle(lt_status_now,turning_angle,step)
+			bw.speed,step,turning_angle = calcualate_angle_speed(lt_status_now,forward_speed,turning_angle,step)
 
 		fw.wheel.write(turning_angle)
 		current_angle = turning_angle
