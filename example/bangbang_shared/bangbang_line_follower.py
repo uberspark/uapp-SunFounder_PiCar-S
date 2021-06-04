@@ -20,6 +20,7 @@ import ctypes
 import pathlib
 import sys
 import os
+import numpy 
 
 
 # This is the beginning of the script
@@ -27,6 +28,10 @@ import os
 libname = os.path.abspath(".") + "/" + "../../../uobjcoll-SunFounder_Line_Follower/libLine_Follower.so";
 print(libname)
 c_lib = ctypes.CDLL(libname)
+
+banglibname = os.path.abspath(".") + "/" + "bangbang.so"
+bang_lib = ctypes.CDLL(banglibname)
+bang_lib.calculate_angle_speed.argtypes = [ numpy.ctypeslib.ndpointer(dtype=numpy.int32), ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int]
 
 picar.setup()
 rslt = c_lib.lib_init()
@@ -59,8 +64,6 @@ lf.references = REFERENCES
 fw.ready()
 bw.ready()
 fw.turning_max = 45
-
-
 
 
 def setup():
@@ -106,7 +109,7 @@ def calculate_angle(lt_st_now,turn_angle,st):
 	return turn_angle
 
 
-def calcualate_angle_speed(lt_st_now,fw_speed,turn_angle,st):
+def calculate_angle_speed(lt_st_now,fw_speed,turn_angle,st):
 	speed,step = calculate_speed(lt_st_now,fw_speed,st)
 	turn_angle = calculate_angle(lt_st_now,turn_angle,st)
 	return speed,step,turn_angle
@@ -135,9 +138,6 @@ def main():
 
 		off_track_count = 0
 
-		# Angle calculate
-		#bw.speed,step = calculate_speed(lt_status_now,forward_speed,step)
-
 		if lt_status_now == [0,0,0,0,0]:
 			off_track_count += 1
 			if off_track_count > max_off_track_count:
@@ -161,9 +161,15 @@ def main():
 			else:
 				off_track_count = 0
 		else:
-			#turning_angle = calculate_angle(lt_status_now,turning_angle,step)
-			bw.speed,step,turning_angle = calcualate_angle_speed(lt_status_now,forward_speed,turning_angle,step)
-
+			ret_speed,step,turning_angle = calculate_angle_speed(lt_status_now,forward_speed,turning_angle,step)
+			bw.speed = ret_speed
+			bang_list = bang_lib.calculate_angle_speed(numpy.array(lt_status_now),5,forward_speed,turning_angle,step)
+			ptr = ctypes.cast(bang_list,ctypes.POINTER(ctypes.c_int))
+			print(ret_speed,ptr[0])
+			bw.speed = ptr[0] 
+			print(step,ptr[1])
+			print(turning_angle,ptr[2])
+			
 		fw.wheel.write(turning_angle)
 		current_angle = turning_angle
 		time.sleep(delay)
