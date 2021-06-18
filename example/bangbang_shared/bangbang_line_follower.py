@@ -29,7 +29,7 @@ libname = os.path.abspath(".") + "/" + "../../../uobjcoll-SunFounder_Line_Follow
 print(libname)
 c_lib = ctypes.CDLL(libname)
 
-banglibname = os.path.abspath(".") + "/" + "bangbang.so"
+banglibname = os.path.abspath(".") + "/" + "libbangbang.so"
 bang_lib = ctypes.CDLL(banglibname)
 bang_lib.calculate_angle_speed.argtypes = [ numpy.ctypeslib.ndpointer(dtype=numpy.int32), ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int]
 
