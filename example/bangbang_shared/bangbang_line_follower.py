@@ -71,12 +71,12 @@ def main():
 	while True:
         ### clib call
 		lt_status_now = []
-		dt_list = bang_lib.read_digital()
-		ptr = ctypes.cast(dt_list,ctypes.POINTER(ctypes.c_int))
+		bang_list = bang_lib.calculate_angle_speed(forward_speed,turning_angle,step)
+		ptr = ctypes.cast(bang_list,ctypes.POINTER(ctypes.c_int))
 		for i in range(0,5):
 			lt_status_now.append(ptr[i])
-		#diff_ms = (time.time() * 1000) - start_time_ms
-		#print(str(lt_status_now)[1:-1] + ", " + str(diff_ms))
+		diff_ms = (time.time() * 1000) - start_time_ms
+		print(str(lt_status_now)[1:-1] + ", " + str(diff_ms))
 		off_track_count = 0
 		if lt_status_now == [0,0,0,0,0]:
 			off_track_count += 1
@@ -101,8 +101,6 @@ def main():
 			else:
 				off_track_count = 0
 		else:
-			bang_list = bang_lib.calculate_angle_speed(forward_speed,turning_angle,step)
-			ptr = ctypes.cast(bang_list,ctypes.POINTER(ctypes.c_int))
 			bw.speed = ptr[5]
 			step = ptr[6]
 			turning_angle = ptr[7]
