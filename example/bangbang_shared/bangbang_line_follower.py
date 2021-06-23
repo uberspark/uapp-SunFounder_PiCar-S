@@ -67,7 +67,6 @@ def main():
 	bw.forward()
 	lt_status_now = []
 	step = 0
-
 	start_time_ms = time.time() * 1000
 	while True:
         ### clib call
@@ -76,8 +75,8 @@ def main():
 		ptr = ctypes.cast(dt_list,ctypes.POINTER(ctypes.c_int))
 		for i in range(0,5):
 			lt_status_now.append(ptr[i])
-		diff_ms = (time.time() * 1000) - start_time_ms
-		print(str(lt_status_now)[1:-1] + ", " + str(diff_ms))
+		#diff_ms = (time.time() * 1000) - start_time_ms
+		#print(str(lt_status_now)[1:-1] + ", " + str(diff_ms))
 		off_track_count = 0
 		if lt_status_now == [0,0,0,0,0]:
 			off_track_count += 1
@@ -104,9 +103,9 @@ def main():
 		else:
 			bang_list = bang_lib.calculate_angle_speed(forward_speed,turning_angle,step)
 			ptr = ctypes.cast(bang_list,ctypes.POINTER(ctypes.c_int))
-			bw.speed = ptr[0]
-			step = ptr[1]
-			turning_angle = ptr[2]
+			bw.speed = ptr[5]
+			step = ptr[6]
+			turning_angle = ptr[7]
 
 		fw.wheel.write(turning_angle)
 		current_angle = turning_angle

@@ -6,7 +6,7 @@
    result_array[1] - step
    result_array[2] - turn_angle
 */
-__attribute__ ((section("i2c_section_4"))) static  int result_array[3]  = {0};
+__attribute__ ((section("i2c_section_4"))) static  int result_array[8]  = {0};
 
 /* Private Functions */
 void calculate_speed(int *array,int arr_len,int fw_speed,int *sp, int *st){
@@ -87,11 +87,17 @@ int * calculate_angle_speed(int fw_speed,int turn_angle,int st){
    int step = st;
    int turning_angle = turn_angle;
    int *array;
+   int i;
    array = read_digital();
    calculate_speed(array,NUM_REF,fw_speed,&speed,&step);
    calculate_angle(array,NUM_REF,&turning_angle,step);
-   result_array[0] = speed;
-   result_array[1] = step;
-   result_array[2] = turning_angle;
+   /* Return the i2c readings in the first NUM_REF (5) bytes  */
+   for(i=0;i<NUM_REF;i++){
+      result_array[i] = array[i];
+   }
+   /* Return the other three parameters to the caller (Python) */
+   result_array[NUM_REF] = speed;
+   result_array[NUM_REF+1] = step;
+   result_array[NUM_REF+2] = turning_angle;
    return result_array;
 }

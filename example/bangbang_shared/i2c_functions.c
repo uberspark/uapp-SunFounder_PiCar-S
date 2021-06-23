@@ -8,7 +8,7 @@
 #include <fcntl.h>			//Needed for I2C port
 #include <sys/ioctl.h>			//Needed for I2C port
 #include <linux/i2c-dev.h>		//Needed for I2C port
-#include "i2c_functions.h" 
+#include "i2c_functions.h"
 #include "xmhfcrypto.h"
 #include "picar-s.h"
 
@@ -34,7 +34,7 @@ int read_i2c(char *buffer,int length){
    unsigned char digest_result[HMAC_DIGEST_SIZE];
 
    //printf("read_i2c() :: encrypted_buffer address : %p \n",encrypted_buffer);
-   printf("read_i2c() :: decrypted_buffer address : %p \n",decrypted_buffer);
+   //printf("read_i2c() :: decrypted_buffer address : %p \n",decrypted_buffer);
    //----- OPEN THE I2C BUS -----
    char *filename = (char*)"/dev/i2c-1";
    if ((file_i2c = open(filename, O_RDWR)) < 0)
