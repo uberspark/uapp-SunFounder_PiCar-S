@@ -27,7 +27,7 @@ import numpy
 # Initialize the access to the C library
 banglibname = os.path.abspath(".") + "/" + "libbangbang.so"
 bang_lib = ctypes.CDLL(banglibname)
-bang_lib.calculate_angle_speed.argtypes = [ numpy.ctypeslib.ndpointer(dtype=numpy.int32), ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int]
+bang_lib.calculate_angle_speed.argtypes = [ ctypes.c_int, ctypes.c_int, ctypes.c_int]
 
 picar.setup()
 rslt = bang_lib.lib_init()
@@ -102,7 +102,7 @@ def main():
 			else:
 				off_track_count = 0
 		else:
-			bang_list = bang_lib.calculate_angle_speed(numpy.array(lt_status_now),5,forward_speed,turning_angle,step)
+			bang_list = bang_lib.calculate_angle_speed(forward_speed,turning_angle,step)
 			ptr = ctypes.cast(bang_list,ctypes.POINTER(ctypes.c_int))
 			bw.speed = ptr[0]
 			step = ptr[1]

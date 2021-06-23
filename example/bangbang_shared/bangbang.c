@@ -82,12 +82,14 @@ void calculate_angle(int *array,int arr_len,int *turn_angle, int st){
 
 
 /* Public function */
-int * calculate_angle_speed(int *array,int arr_len,int fw_speed,int turn_angle,int st){
+int * calculate_angle_speed(int fw_speed,int turn_angle,int st){
    int speed = fw_speed;
    int step = st;
    int turning_angle = turn_angle;
-   calculate_speed(array,arr_len,fw_speed,&speed,&step);
-   calculate_angle(array,arr_len,&turning_angle,step);
+   int *array;
+   array = read_digital();
+   calculate_speed(array,NUM_REF,fw_speed,&speed,&step);
+   calculate_angle(array,NUM_REF,&turning_angle,step);
    result_array[0] = speed;
    result_array[1] = step;
    result_array[2] = turning_angle;
