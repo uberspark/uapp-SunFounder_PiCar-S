@@ -25,16 +25,12 @@ import numpy
 
 # This is the beginning of the script
 # Initialize the access to the C library
-libname = os.path.abspath(".") + "/" + "../../../uobjcoll-SunFounder_Line_Follower/libLine_Follower.so";
-print(libname)
-c_lib = ctypes.CDLL(libname)
-
 banglibname = os.path.abspath(".") + "/" + "libbangbang.so"
 bang_lib = ctypes.CDLL(banglibname)
 bang_lib.calculate_angle_speed.argtypes = [ numpy.ctypeslib.ndpointer(dtype=numpy.int32), ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int]
 
 picar.setup()
-rslt = c_lib.lib_init()
+rslt = bang_lib.lib_init()
 if rslt == -1:
 	print("lib_init() failed")
 	exit()
@@ -76,7 +72,7 @@ def main():
 	while True:
         ### clib call
 		lt_status_now = []
-		dt_list = c_lib.read_digital()
+		dt_list = bang_lib.read_digital()
 		ptr = ctypes.cast(dt_list,ctypes.POINTER(ctypes.c_int))
 		for i in range(0,5):
 			lt_status_now.append(ptr[i])
@@ -94,7 +90,7 @@ def main():
 				current_angle = tmp_angle
 
 				### clib call
-				c_lib.wait_tile_center()
+				bang_lib.wait_tile_center()
 				bw.stop()
 
 				fw.wheel.write(turning_angle)
@@ -119,7 +115,7 @@ def main():
 def destroy():
 	bw.stop()
 	fw.turn(90)
-	rslt = c_lib.lib_exit()
+	rslt = bang_lib.lib_exit()
 	if rslt == -1:
 		print("lib_exit() failed")
 
