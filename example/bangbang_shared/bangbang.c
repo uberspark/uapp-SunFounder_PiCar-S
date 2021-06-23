@@ -1,5 +1,6 @@
 
 #include "bangbang.h"
+#include "i2c_functions.h"
 /* Array used for retruning the results
    result_array[0] - speed
    result_array[1] - step
