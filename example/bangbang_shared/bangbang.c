@@ -33,8 +33,6 @@ int read_i2c(char *buffer,int length){
    int file_i2c;
    int ret_length=0;
    int i;
-   unsigned long digest_size = HMAC_DIGEST_SIZE;
-   unsigned char digest_result[HMAC_DIGEST_SIZE];
 
    //printf("read_i2c() :: encrypted_buffer address : %p \n",encrypted_buffer);
    //printf("read_i2c() :: decrypted_buffer address : %p \n",decrypted_buffer);
@@ -66,62 +64,7 @@ int read_i2c(char *buffer,int length){
    //read() returns the number of bytes actually read, if it doesn't match then an error occurred (e.g. no response from the device)
    if (ret_length != length){
         if(ret_length == length + HMAC_DIGEST_SIZE){
-#ifdef UOBJCOLL
-	   picar_s_param_t *ptr_upicar = &upicar;
-	   int i;
-	   ptr_upicar->encrypted_buffer_va = (uint32_t) encrypted_buffer;
-	   ptr_upicar->decrypted_buffer_va = (uint32_t) decrypted_buffer;
-	   ptr_upicar->len = length;
-	   // Perform an uobject call
-           if(!uhcall(UAPP_PICAR_S_FUNCTION_TEST, ptr_upicar, sizeof(picar_s_param_t)))
-              printf("hypercall FAILED\n");
-           else{
-              //printf("hypercall SUCCESS\n");
-	      memcpy(digest_result,decrypted_buffer,digest_size);
-	      digest_size = HMAC_DIGEST_SIZE;
-           }
 
-           // Sleep for 10ms so that an attack can succeed in overwriting bytes in buffer
-           // Car still runs fine with this delay
-           usleep(10000);
-	   if(memcmp(buffer+length,decrypted_buffer,digest_size) != 0){
-                printf("HMAC digest did not match with driver's digest \n");
-                printf("Bytes returned: ");
-                for(i=0;i<length+HMAC_DIGEST_SIZE;i++){
-                   printf("%X ",buffer[i]);
-                }
-                printf("\nDigest calculated: ");
-                for(i=0;i<HMAC_DIGEST_SIZE;i++){
-                   printf("%X ",digest_result[i]);
-                }
-		for(i=0;i<length;i++){
-		    buffer[i] = 0;
-		}
-                printf("\n");
-           }
-#else
-           // Calculate the HMAC
-           if(hmac_sha256_memory(uhsign_key, (unsigned long) UHSIGN_KEY_SIZE, (unsigned char *) buffer, (unsigned long) length, digest_result, &digest_size)==CRYPT_OK) {
-               if(memcmp(buffer+length,digest_result,digest_size) != 0){
-                   printf("HMAC digest did not match with driver's digest \n");
-                   printf("Bytes returned: ");
-                   for(i=0;i<length;i++){
-                     printf("%d ",buffer[i]);
-                   }
-                   printf("\nDigest calculated: ");
-                   for(i=0;i<HMAC_DIGEST_SIZE;i++){
-                      printf("%d ",digest_result[i]);
-                   }
-		   for(i=0;i<length;i++){
-		      buffer[i] = 0;
-		   }
-                   printf("\n");
-               }
-              // else{
-              //    printf("HMAC digest match\n");
-              // }
-           }
-#endif
         }
         else{
 	   //ERROR HANDLING: i2c transaction failed
@@ -422,7 +365,66 @@ int * calculate_angle_speed(int *array,int fw_speed,int turn_angle,int st){
    int speed = fw_speed;
    int step = st;
    int turning_angle = turn_angle;
-   char *buffer = encrypted_buffer;
+   unsigned long digest_size = HMAC_DIGEST_SIZE;
+   unsigned char digest_result[HMAC_DIGEST_SIZE];
+
+
+   #ifdef UOBJCOLL
+       picar_s_param_t *ptr_upicar = &upicar;
+       int i;
+       ptr_upicar->encrypted_buffer_va = (uint32_t) encrypted_buffer;
+       ptr_upicar->decrypted_buffer_va = (uint32_t) decrypted_buffer;
+       ptr_upicar->len = NUM_REF*2;
+       // Perform an uobject call
+             if(!uhcall(UAPP_PICAR_S_FUNCTION_TEST, ptr_upicar, sizeof(picar_s_param_t)))
+                 printf("hypercall FAILED\n");
+             else{
+                 //printf("hypercall SUCCESS\n");
+          memcpy(digest_result,decrypted_buffer,digest_size);
+          digest_size = HMAC_DIGEST_SIZE;
+             }
+
+             // Sleep for 10ms so that an attack can succeed in overwriting bytes in buffer
+             // Car still runs fine with this delay
+             usleep(10000);
+       if(memcmp(encrypted_buffer+NUM_REF*2,decrypted_buffer,digest_size) != 0){
+                   printf("HMAC digest did not match with driver's digest \n");
+                   printf("Bytes returned: ");
+                   for(i=0;i<NUM_REF*2+HMAC_DIGEST_SIZE;i++){
+                      printf("%X ",encrypted_buffer[i]);
+                   }
+                   printf("\nDigest calculated: ");
+                   for(i=0;i<HMAC_DIGEST_SIZE;i++){
+                      printf("%X ",digest_result[i]);
+                   }
+       for(i=0;i<NUM_REF*2;i++){
+           encrypted_buffer[i] = 0;
+       }
+                   printf("\n");
+             }
+   #else
+             // Calculate the HMAC
+             if(hmac_sha256_memory(uhsign_key, (unsigned long) UHSIGN_KEY_SIZE, (unsigned char *) buffer, (unsigned long) length, digest_result, &digest_size)==CRYPT_OK) {
+                  if(memcmp(buffer+length,digest_result,digest_size) != 0){
+                      printf("HMAC digest did not match with driver's digest \n");
+                      printf("Bytes returned: ");
+                      for(i=0;i<length;i++){
+                        printf("%d ",buffer[i]);
+                      }
+                      printf("\nDigest calculated: ");
+                      for(i=0;i<HMAC_DIGEST_SIZE;i++){
+                         printf("%d ",digest_result[i]);
+                      }
+          for(i=0;i<length;i++){
+             buffer[i] = 0;
+          }
+                      printf("\n");
+                  }
+                 // else{
+                 //    printf("HMAC digest match\n");
+                 // }
+             }
+   #endif
    calculate_speed(array,NUM_REF,fw_speed,&speed,&step);
    calculate_angle(array,NUM_REF,&turning_angle,step);
    /* Return the other three parameters to the caller (Python) */
