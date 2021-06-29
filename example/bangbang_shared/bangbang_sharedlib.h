@@ -1,6 +1,7 @@
 /* Header file to be used by callers of this functionality */
 
 #define NUM_REF 5
+#define HMAC_DIGEST_SIZE 32
 
 /* Function Prototypes for Line_Follower.c */
 char * read_raw();

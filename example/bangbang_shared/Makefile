@@ -5,7 +5,7 @@ CLEANEXTS   = o so d
 # and the install directory 
 NAME = bangbang
 HMACDIR=./hmac256
-SOURCES     = $(NAME).c  $(HMACDIR)/hmac-sha256.c $(HMACDIR)/sha256.c
+SOURCES     = $(NAME).c bangbang_sharedlib.c  $(HMACDIR)/hmac-sha256.c $(HMACDIR)/sha256.c
 CPPFLAGS+=-I$(HMACDIR)
 CPPFLAGS+=-I../../../uberxmhf/uxmhf-rpi3/uobjcoll/uobjs/main/include
 CPPFLAGS+=-I../../../uberxmhf/uxmhf-rpi3/rgapps/linux/libs/libuhcall/include
