@@ -27,6 +27,7 @@ import numpy
 # Initialize the access to the C library
 banglibname = os.path.abspath(".") + "/" + "libbangbang.so"
 bang_lib = ctypes.CDLL(banglibname)
+# Declare the argument types for the C functions we call
 bang_lib.calculate_angle_speed.argtypes = [ctypes.c_char_p,numpy.ctypeslib.ndpointer(dtype=numpy.int32), ctypes.c_int, ctypes.c_int, ctypes.c_int]
 bang_lib.uobj_read_digital.argtypes = [ctypes.c_char_p]
 bang_lib.uobj_read_raw.argtypes = [ctypes.c_char_p]
@@ -69,17 +70,18 @@ def main():
 	lt_status_now = []
 	step = 0
 	start_time_ms = time.time() * 1000
-	pythonArray = bytearray(42)
+	pythonArray = bytearray(42) # 10 bytes for payload and 32 bytes for HMAC
 	# Convert the Python bytearray to a C array of char
 	ptrArray = ctypes.create_string_buffer(bytes(pythonArray), len(pythonArray))
 	while True:
         ### clib call
-		bang_lib.uobj_read_raw(ptrArray)
-		sensor_list = bang_lib.uobj_read_digital(ptrArray)
+		bang_lib.uobj_read_raw(ptrArray) # Get the raw bytes and HMAC data
+		sensor_list = bang_lib.uobj_read_digital(ptrArray) # Form the bits
 		lt_status_now = []
 		ptr = ctypes.cast(sensor_list,ctypes.POINTER(ctypes.c_int))
 		for i in range(0,5):
 			lt_status_now.append(ptr[i])
+		# We will pass the array and have the function check out HMAC
 		bang_list = bang_lib.calculate_angle_speed(ptrArray,numpy.array(lt_status_now),forward_speed,turning_angle,step)
 		ptr = ctypes.cast(bang_list,ctypes.POINTER(ctypes.c_int))
 		diff_ms = (time.time() * 1000) - start_time_ms
