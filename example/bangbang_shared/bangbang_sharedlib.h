@@ -5,6 +5,7 @@
 
 /* Function Prototypes for Line_Follower.c */
 char * read_raw();
+int uobj_read_raw(char *buffer);
 int * read_analog(int trys);
 int * read_digital();
 float * get_average(int mount);

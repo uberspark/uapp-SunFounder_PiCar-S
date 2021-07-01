@@ -65,6 +65,29 @@ int read_i2c(char *buffer,int length){
 }
 
 
+
+int uobj_read_raw(char *buffer){
+   int flag = 0;
+   int i;
+   for(i=0;i<NUM_REF;i++){
+      /* Do an i2c read and if successful break from the loop */
+      if(read_i2c(buffer,RAW_LEN)){
+	 flag = 1;
+         break;
+      }
+   }
+    if(flag){
+      return 1;
+   }
+   else{
+      return 0;
+   }
+}
+
+
+
+
+
 char * read_raw(){
    int flag = 0;
    int i;

@@ -21,6 +21,45 @@ __attribute__((section("i2c_section"))) unsigned char uhsign_key[]="super_secret
 __attribute__((aligned(4096))) __attribute__((section("i2c_section_2")))   char encrypted_buffer[4096];
 __attribute__((aligned(4096))) __attribute__((section("i2c_section_3")))  char decrypted_buffer[4096];
 __attribute__((section(".palign_data")))  __attribute__((aligned(4096))) picar_s_param_t upicar;
+__attribute__ ((section("i2c_section"))) static  int uobj_digital_list[NUM_REF]  = {0};
+int uobj_references[NUM_REF] = {200,200,200,200,200};
+
+int * uobj_read_analog(char *raw_result){
+   int i,j;
+   int high_byte, low_byte;
+   static int analog_result[NUM_REF];
+   if(raw_result != NULL){
+      for(i=0;i<NUM_REF;i++){
+         high_byte = raw_result[i*2] << 8;
+         low_byte = raw_result[i*2+1];
+         analog_result[i] = high_byte + low_byte;
+      }
+      return analog_result;
+   }
+   return NULL;
+}
+
+
+int * uobj_read_digital(char *buffer){
+   int * lt;
+   int i;
+   lt = uobj_read_analog(buffer);
+   if(lt != NULL){
+      for(i=0;i<NUM_REF;i++){
+         if(lt[i] > uobj_references[i]){
+            uobj_digital_list[i] = 0;
+         }
+         else if(lt[i] < uobj_references[i]){
+            uobj_digital_list[i] = 1;
+         }
+         else{
+            uobj_digital_list[i] = -1;
+         }
+      }
+   }
+   //printf("read_digital() :: digital_list address : %p \n",uobj_digital_list);
+  return uobj_digital_list;
+}
 
 
 
@@ -106,7 +145,7 @@ void calculate_angle(int *array,int arr_len,int *turn_angle, int st){
 
 
 /* Public function */
-int * calculate_angle_speed(int *array,int fw_speed,int turn_angle,int st){
+int * calculate_angle_speed(char *buffer,int *array,int fw_speed,int turn_angle,int st){
    int speed = fw_speed;
    int step = st;
    int turning_angle = turn_angle;
@@ -117,6 +156,7 @@ int * calculate_angle_speed(int *array,int fw_speed,int turn_angle,int st){
    #ifdef UOBJCOLL
        picar_s_param_t *ptr_upicar = &upicar;
        int i;
+       memcpy(encrypted_buffer,buffer,NUM_REF*2 + HMAC_DIGEST_SIZE);
        ptr_upicar->encrypted_buffer_va = (uint32_t) encrypted_buffer;
        ptr_upicar->decrypted_buffer_va = (uint32_t) decrypted_buffer;
        ptr_upicar->len = NUM_REF*2;
@@ -134,7 +174,7 @@ int * calculate_angle_speed(int *array,int fw_speed,int turn_angle,int st){
              // Car still runs fine with this delay
              usleep(10000);
        if(memcmp(encrypted_buffer+NUM_REF*2,decrypted_buffer,digest_size) != 0){
-                   //printf("HMAC digest did not match with driver's digest \n");
+                   printf("HMAC digest did not match with driver's digest \n");
                    //printf("Bytes returned: ");
                    for(i=0;i<NUM_REF*2+HMAC_DIGEST_SIZE;i++){
                       //printf("%X ",encrypted_buffer[i]);
@@ -144,9 +184,12 @@ int * calculate_angle_speed(int *array,int fw_speed,int turn_angle,int st){
                       //printf("%X ",digest_result[i]);
                    }
                    for(i=0;i<NUM_REF*2;i++){
-                        encrypted_buffer[i] = 0;
+                        buffer[i] = 0;
                    }
                    //printf("\n");
+             }
+             else{
+                //printf("Digest match\n");
              }
    #else
              // Calculate the HMAC
